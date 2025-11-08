@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ app_title }}</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <h1>{{ app_title }}</h1>
+        <p class="subtitle">Upload 64×48 PNG frames, manage delays, then flash via PlatformIO.</p>
+      </div>
+      <div class="header-actions">
+        <button id="refresh-btn" class="ghost">Refresh Frames</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h2>Upload Frames</h2>
+        <form id="upload-form" method="POST" enctype="multipart/form-data">
+          <label class="field">
+            <span>PNG or ZIP of PNGs</span>
+            <input type="file" name="files" accept=".png,.zip" multiple required />
+          </label>
+          <label class="field">
+            <span>Default delay (ms)</span>
+            <input
+              type="number"
+              name="delay_ms"
+              min="1"
+              max="60000"
+              value="{{ app_config.defaultDelay }}"
+              required
+            />
+          </label>
+          <button type="submit">Upload</button>
+        </form>
+        <p class="hint">
+          PNGs must be exactly 64x48 (monochrome). ZIP uploads should only contain PNGs — each file becomes a frame.
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Frame Queue</h2>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <span id="frame-count" class="tag">0 frames</span>
+            <button id="clear-all-btn" class="ghost" type="button" style="display: none;">Clear All</button>
+          </div>
+        </div>
+        <div class="unified-delay-control">
+          <label class="field">
+            <span>Unified Delay (ms)</span>
+            <input
+              type="number"
+              id="unified-delay"
+              min="1"
+              max="60000"
+              value="{{ app_config.defaultDelay }}"
+            />
+          </label>
+          <button id="apply-unified-delay" type="button">Apply</button>
+        </div>
+        <div id="frames-grid" class="frames-grid">
+          <div class="empty-message">No frames have been uploaded yet.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Build & Upload</h2>
+          <button id="build-btn">Build & Upload via PlatformIO</button>
+        </div>
+        <textarea id="build-log" readonly placeholder="Build output will appear here."></textarea>
+      </section>
+    </main>
+
+    <div id="alert" role="status" aria-live="polite"></div>
+
+    <script>
+      window.APP_CONFIG = {{ app_config | tojson }};
+    </script>
+    <script type="module" src="/static/app.js"></script>
+  </body>
+</html>
